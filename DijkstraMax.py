@@ -42,4 +42,4 @@ class DijkstraMax:
                     heapq.heappush(self.Q, PriorityQueueNode(v))
 
         # Return vertices sorted by their d value in descending order
-        return sorted(self.graph.V, key=lambda x: x.d, reverse=True)ss
+        return sorted(self.graph.V, key=lambda x: x.d, reverse=True)
