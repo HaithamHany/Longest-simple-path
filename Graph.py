@@ -1,3 +1,6 @@
+from Vertex import Vertex
+from Edge import Edge
+
 class Graph:
     """
     Represents a graph structure loaded from a file. This graph supports operations like reading from a file,
@@ -62,7 +65,7 @@ class Graph:
         Finds all vertices adjacent to a given vertex.
 
         Parameters:
-            v (Vertex): The vertex to find the adjacents for.
+            v (Vertex): The vertex to find the adjacent for.
 
         Returns:
             list: A list of vertices adjacent to `v`.
