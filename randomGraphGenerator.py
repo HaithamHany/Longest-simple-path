@@ -27,7 +27,7 @@ def generate_geometric_graph(n, r):
 
 def main():
     # Generate a graph with 10 vertices and maximum edge length of 0.7
-    v, e = generate_geometric_graph(10, 0.7)
+    v, e = generate_geometric_graph(15, 0.7)
 
     with open('graph.edges', 'w') as f:
         # # Write vertices

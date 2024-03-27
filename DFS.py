@@ -4,7 +4,7 @@ from math import sqrt
 from random import choice
 import sys
 from time import time
-sys.setrecursionlimit(1500) # important because for large graph we will need lost of recursion for DFS
+sys.setrecursionlimit(2000) # important because for large graph we will need lost of recursion for DFS
 
 
 def DFS_LCC(G: Graph) -> List[Vertex]:
@@ -86,8 +86,10 @@ def DFS_VISIT(G: Graph, v: Vertex, component=None):
 
     # Explore each adjacent vertex
     for u in G.Adj(v):
-        if u.color == "WHITE":  # If the vertex is unvisited
+        if u.color == "WHITE":
+            # If the vertex is unvisited
             u.pi = v  # Set the current vertex as the predecessor
+
             DFS_VISIT(G, u, component)  # Recursively visit the adjacent vertex
 
     # After exploring all adjacent vertices, increment the global time again
@@ -219,6 +221,6 @@ def main_heuristic_1(file: str):
 
 
 if __name__ == "__main__":
-    file = "graph.edges" # our graph
-    #file = "inf-euroroad.edges"
+    #file = "graph.edges" # our graph
+    file = "inf-euroroad.edges"
     main_heuristic_1(file)

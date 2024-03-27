@@ -112,6 +112,17 @@ class Edge:
         )
         return eq
 
+    def __hash__(self):
+        """
+        Returns a hash that allows Edge to be used in sets or as dictionary keys.
+        The hash is designed so that the order of vertices doesn't affect the hash value, making the edge "undirected" in nature.
+
+        Returns:
+            int: The hash of the edge.
+        """
+        # This ensures that the hash is the same regardless of the order of vertex_u and vertex_v
+        return hash(frozenset([self.vertex_u, self.vertex_v]))
+
     def __str__(self):
         """
         Provides a string representation of the edge, showing the IDs of the vertices it connects.
@@ -158,19 +169,30 @@ class Graph:
         Private method to read the graph's vertices and edges from a file specified by `self.file`.
         """
         self.V, self.E = [], []  # Initialize lists for vertices (V) and edges (E)
+        vertex_map = {}  # Map to track existing vertices by ID to ensure uniqueness
         with open(self.file, "r") as file:
-            f = file.readlines()
-        for l in f:
-            line_split = l.split(" ")
-            u = Vertex(id=int(line_split[0]))  # Assumes existence of a Vertex class with an 'id' attribute
-            v = Vertex(id=int(line_split[1]))
-            e = Edge(vertex_u=u, vertex_v=v)  # Assumes existence of an Edge class
-            if e not in self.E:
-                self.E.append(e)
-            if u not in self.V:
-                self.V.append(u)
-            if v not in self.V:
-                self.V.append(v)
+            for l in file.readlines():
+                line_split = l.split(" ")
+                u_id, v_id = int(line_split[0]), int(line_split[1])
+
+                # Reuse vertex if it exists, otherwise create a new one and add to map
+                if u_id not in vertex_map:
+                    u = Vertex(id=u_id)
+                    vertex_map[u_id] = u
+                    self.V.append(u)
+                else:
+                    u = vertex_map[u_id]
+
+                if v_id not in vertex_map:
+                    v = Vertex(id=v_id)
+                    vertex_map[v_id] = v
+                    self.V.append(v)
+                else:
+                    v = vertex_map[v_id]
+
+                e = Edge(vertex_u=u, vertex_v=v)  # Create edge with the existing vertex instances
+                if e not in self.E:
+                    self.E.append(e)
 
     def reset_vertices(self):
         """
