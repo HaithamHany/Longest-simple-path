@@ -57,7 +57,12 @@ class Heuristics:
                     # and rely on the visited set to avoid processing a node more than once
                     heapq.heappush(self.Q, PriorityQueueNode(v, v.d))
 
-        return sorted([v for v in self.graph.V if v.d != float('-inf')], key=lambda x: x.d, reverse=True)
+        # Find the vertex with the maximum distance
+        max_vertex = max((v for v in self.graph.V if v.d != float('-inf')), key=lambda x: x.d)
+
+        # Calculate the number of edges in the longest path
+        L_max_dijkstra = max_vertex.d - 1 if max_vertex.pi is not None else 0
+        return L_max_dijkstra
 
     def DFS_LCC(self) -> List[Vertex]:
         """
@@ -304,8 +309,7 @@ def main_heuristic_1(file: str):
 
     # Calculate the longest path using Dijkstra's algorithm
     start_dijkstra = time()
-    longest_path_dijkstra = heuristics.dijkstra_max(heuristics.graph.V[0])
-    L_max_dijkstra = longest_path_dijkstra[0].d
+    L_max_dijkstra = heuristics.dijkstra_max(heuristics.graph.V[0])
     end_dijkstra = time()
 
     # Calculate the longest path using A* algorithm
