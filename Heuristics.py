@@ -1,6 +1,5 @@
 import heapq
-from Graph import Graph
-from Vertex import Vertex
+from Graph import Graph, Vertex
 from typing import List
 from math import sqrt
 from random import choice
@@ -53,7 +52,7 @@ class Heuristics:
         # Return vertices sorted by their d value in descending order
         return sorted(self.graph.V, key=lambda x: x.d, reverse=True)
 
-    def DFS_LCC(self):
+    def DFS_LCC(self) -> List[Vertex]:
         """
         Finds the largest connected component (LCC) in a graph using depth-first search (DFS).
 
@@ -64,8 +63,7 @@ class Heuristics:
         Returns:
             List[Vertex]: A list of vertices belonging to the largest connected component.
         """
-        # Reset all vertices to the initial state, typically setting their color to "WHITE"
-        self.graph.reset_vertices()
+        self.graph.reset_vertices()  # Reset all vertices to the initial state, typically setting their color to "WHITE"
         self.time = 0  # Time counter used in DFS_VISIT, might track discovery/finish times of vertices
 
         largest_component = []  # Initialize empty list to store the vertices of the largest component found
@@ -86,15 +84,14 @@ class Heuristics:
         to explore the graph fully, for purposes like graph traversal, finding connected components, or
         other graph algorithms that require visiting all vertices.
         """
-        # Reset all vertices to their initial state, typically setting their color to "WHITE"
-        self.graph.reset_vertices()
+        self.graph.reset_vertices()  # Reset all vertices to their initial state, typically setting their color to "WHITE"
         self.time = 0  # Initialize a time counter used by DFS_VISIT, may track discovery/finishing times of vertices
 
         for v in self.graph.V:  # Iterate over each vertex in the graph
             if v.color == "WHITE":  # If the vertex is unvisited
                 self.DFS_VISIT(v)  # Perform a depth-first search from the vertex
 
-    def DFS_VISIT(self, v, component=None):
+    def DFS_VISIT(self, v: Vertex, component=None):
         """
         Perform a depth-first search visit starting from vertex v in graph G.
         This function marks the discovery and finishing times for each vertex
@@ -107,9 +104,6 @@ class Heuristics:
           finishing time 'f', color 'color', and predecessor 'pi'.
         - component (list, optional): A list to store the vertices of the same connected component. If provided,
           vertices will be added to this list as they are visited. Useful for finding connected components in a graph.
-
-        Returns:
-        None
         """
         # Increment the global time at the beginning of the visit
         self.time += 1
@@ -122,8 +116,10 @@ class Heuristics:
 
         # Explore each adjacent vertex
         for u in self.graph.Adj(v):
-            if u.color == "WHITE":  # If the vertex is unvisited
+            if u.color == "WHITE":
+                # If the vertex is unvisited
                 u.pi = v  # Set the current vertex as the predecessor
+
                 self.DFS_VISIT(u, component)  # Recursively visit the adjacent vertex
 
         # After exploring all adjacent vertices, increment the global time again
@@ -131,20 +127,18 @@ class Heuristics:
         v.f = self.time  # Set the finishing time of the vertex
         v.color = "BLACK"  # Mark the vertex as fully visited
 
-    def DFS_VISIT_RETURN_DEEPEST(self, start_vertex):
+    def DFS_VISIT_RETURN_DEEPEST(self, start_vertex: Vertex) -> Vertex:
         """
         Perform a modified depth-first search (DFS) starting from a given vertex, aimed at finding
         the deepest vertex reachable from the start vertex.
 
         Parameters:
-            - start_vertex (Vertex): The vertex from which the DFS starts.
+        - start_vertex (Vertex): The vertex from which the DFS starts.
 
         Returns:
-            Vertex: The deepest vertex reached during the DFS. If multiple vertices are at the same depth,
-            the function returns the first one encountered at this maximum depth.
+        Vertex: The deepest vertex reached during the DFS.
         """
-        # Reset all vertices to their initial state, typically marking them as unvisited
-        self.graph.reset_vertices()
+        self.graph.reset_vertices()  # Reset all vertices to their initial state, typically marking them as unvisited
         self.time = 0  # Reset the global time counter
         deepest_vertex = {'vertex': None, 'depth': -1}  # Initialize the record for the deepest vertex found
         # Start the DFS from the start_vertex, passing the current depth (0) and the record for tracking the deepest vertex
@@ -157,12 +151,10 @@ class Heuristics:
         Perform a recursive depth-first search (DFS) visit starting from a specific vertex, tracking the deepest vertex reached.
 
         Parameters:
-            - u: The current vertex being visited.
-            - deepest_vertex: A dictionary that tracks the deepest vertex encountered during the DFS.
-            - current_depth (int, optional): The current depth of the DFS from the starting vertex. Defaults to 0.
-
-        Returns:
-            None. The function updates the graph G, the current vertex u, and the deepest_vertex dictionary in-place.
+        - u: The current vertex being visited.
+        - deepest_vertex: A dictionary that tracks the deepest vertex encountered during the DFS. It should have 'vertex'
+         and 'depth' keys. 'vertex' holds the vertex object, and 'depth' represents its depth from the starting vertex.
+        - current_depth (int, optional): The current depth of the DFS from the starting vertex. Defaults to 0.
         """
         # Increment global time for discovery
         self.time += 1
@@ -182,19 +174,12 @@ class Heuristics:
         u.f = self.time  # Set the finish time of the current vertex
         u.color = 'BLACK'  # Mark the current vertex as finished
 
-    def DFS_BASED_LONGEST_SIMPLE_PATH(self):
+    def DFS_BASED_LONGEST_SIMPLE_PATH(self) -> int:
         """
         Finds the length of the longest simple path in a graph using a depth-first search (DFS) based heuristic.
-        This function employs a heuristic approach that iteratively picks random vertices from the largest connected
-        component (LCC) of the graph, then performs DFS from these vertices to find the deepest reachable vertex.
-        By evaluating the distances from the initial vertex to the deepest vertex and the distance from this deepest vertex
-        to its deepest reachable vertex, the function estimates the longest simple path length in the graph.
-
-        Note: This function assumes the input graph is undirected and connected. If the graph is not connected,
-        the function operates on its largest connected component (LCC).
 
         Returns:
-        - L_max (int): An estimate of the length of the longest simple path in the graph.
+            int: An estimate of the length of the longest simple path in the graph.
         """
         # Find the largest connected component (LCC) of the graph
         LCC = self.DFS_LCC()
@@ -294,5 +279,5 @@ def main_heuristic_1(file: str):
 
 
 if __name__ == "__main__":
-    fileName = "graph.edges"  # Path to the graph file
+    fileName = "inf-euroroad.edges"  # Path to the graph file
     main_heuristic_1(fileName)
