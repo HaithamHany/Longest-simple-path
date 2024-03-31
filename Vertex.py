@@ -1,3 +1,6 @@
+import random
+
+
 class Vertex:
     """
     A class representing a vertex in a graph.
@@ -8,6 +11,8 @@ class Vertex:
         d (int): Discovery time of the vertex in a graph traversal algorithm.
         f (int): Finish time of the vertex in a graph traversal algorithm.
         pi (Vertex): The predecessor vertex in a traversal path. None if the vertex has no predecessor.
+        x (float): The x-coordinate of the vertex.
+        y (float): The y-coordinate of the vertex.
 
     Methods:
         __init__(self, id): Initializes a new instance of the Vertex class.
@@ -29,6 +34,9 @@ class Vertex:
         self.d = 0  # Discovery time, initially 0
         self.f = 0  # Finish time, initially 0
         self.pi = None  # Predecessor, initially None
+        self.x = random.random()  # Random x-coordinate between 0 and 1
+        self.y = random.random()  # Random y-coordinate between 0 and 1
+        self.h = 0.0  # Heuristic distance
 
     def __eq__(self, other):
         """
@@ -61,7 +69,7 @@ class Vertex:
         """
         predecessor_id = 'None' if self.pi is None else "Vertex " + str(self.pi.id)
         return (f"Vertex id: {self.id} | color: {self.color} | pi: {predecessor_id} | "
-                f"d: {self.d} | f: {self.f}")
+                f"d: {self.d} | f: {self.f} | x: {self.x} | y: {self.y} | h: {self.h} ")
 
     def reset(self):
         """
@@ -73,3 +81,16 @@ class Vertex:
         self.pi = None  # Remove predecessor
         self.d = 0  # Reset discovery time
         self.f = 0  # Reset finish time
+        self.h = 0.0  # Reset distance heuristic
+
+    def __lt__(self, other):
+        """
+        Compares two vertices based on their key value (u.d + u.h).
+
+        Parameters:
+            other (Vertex): The other vertex to compare against.
+
+        Returns:
+            bool: True if the current vertex has a smaller key value (u.d + u.h), False otherwise.
+        """
+        return (self.d + self.h) < (other.d + other.h)
