@@ -9,11 +9,13 @@ sys.setrecursionlimit(1500)  # important because for large graph we will need lo
 
 
 class PriorityQueueNode:
-    def __init__(self, vertex):
+    def __init__(self, vertex, distance):
         self.vertex = vertex
+        self.distance = distance  # Store the distance for comparison in the priority queue
 
     def __lt__(self, other):
-        return self.vertex.f < other.vertex.f  # Max heap based on d value
+        # Reverse the comparison to make it a max heap based on distance
+        return self.distance > other.distance
 
 
 class Heuristics:
@@ -23,34 +25,39 @@ class Heuristics:
         self.Q = []  # Priority queue
 
     def initialize_single_source_max(self, s):
-        for v in self.graph.V:  # Use the list of vertices from the Graph class
+        for v in self.graph.V:
             v.d = float('-inf')
             v.pi = None
-            setattr(v, 'visited', False)  # Dynamically add 'visited' attribute
         s.d = 0
-        setattr(s, 'visited', True)  # Dynamically mark as visited
-        heapq.heappush(self.Q, PriorityQueueNode(s))  # Push wrapped vertex
+        # Initialize the priority queue with all vertices, but start with s having distance 0
+        for v in self.graph.V:
+            heapq.heappush(self.Q, PriorityQueueNode(v, v.d))
 
     def relax_max(self, u, v):
+        # Check if the new path to v through u is longer than the current known path to v
         if v.d < u.d + 1:
             v.d = u.d + 1
             v.pi = u
-            return True  # Indicates that v.d was increased
+            return True
         return False
 
     def dijkstra_max(self, s):
         self.initialize_single_source_max(s)
+        visited = set()
 
         while self.Q:
             u = heapq.heappop(self.Q).vertex
+            if u in visited:
+                continue
+            visited.add(u)
 
             for v in self.graph.Adj(u):
-                if self.relax_max(u, v) and not getattr(v, 'visited', False):
-                    setattr(v, 'visited', True)
-                    heapq.heappush(self.Q, PriorityQueueNode(v))
+                if self.relax_max(u, v):
+                    # Instead of pushing new nodes to the queue, we update the distances
+                    # and rely on the visited set to avoid processing a node more than once
+                    heapq.heappush(self.Q, PriorityQueueNode(v, v.d))
 
-        # Return vertices sorted by their d value in descending order
-        return sorted(self.graph.V, key=lambda x: x.d, reverse=True)
+        return sorted([v for v in self.graph.V if v.d != float('-inf')], key=lambda x: x.d, reverse=True)
 
     def DFS_LCC(self) -> List[Vertex]:
         """
@@ -242,6 +249,44 @@ class Heuristics:
 
         return sorted(self.graph.V, key=lambda x: x.d, reverse=True)
 
+    def euclidean_distance(self, v1, v2):
+
+       #The Euclidean distance between v1 and v2.
+        return sqrt((v1.x - v2.x) ** 2 + (v1.y - v2.y) ** 2)
+
+    def ida_star(self, root, goal):
+        def search(path, g, bound):
+            node = path[-1]
+            f = g + self.euclidean_distance(node, goal)
+            if f > bound:
+                return f, False
+            if node == goal:
+                return f, True
+            min_bound = float('inf')
+            found = False
+            for neighbor in self.graph.Adj(node):
+                if neighbor not in path:
+                    path.append(neighbor)
+                    t, found_path = search(path, g + 1, bound)  # Increment g since graph is unweighted
+                    if found_path:
+                        found = True
+                        break  # Stop searching when the goal is found
+                    if t < min_bound:
+                        min_bound = t
+                    path.pop()
+            return min_bound, found
+
+        bound = self.euclidean_distance(root, goal)
+        path = [root]
+        while True:
+            t, found = search(path, 0, bound)
+            if found:  # Path found
+                return path
+            if t == float('inf'):  # No solution
+                return None
+            bound = t  # Update the bound
+
+
 
 def main_heuristic_1(file: str):
     # Initialize Heuristics object with the graph file
@@ -269,6 +314,11 @@ def main_heuristic_1(file: str):
     L_max_astar = len(longest_path_astar) - 1  # Length of the path is one less than the number of vertices
     end_astar = time()
 
+    start_ida_star = time()
+    path_ida_star = heuristics.ida_star(heuristics.graph.V[0], heuristics.graph.V[-1])
+    L_maxIDAstar = len(path_ida_star) - 1 if path_ida_star else 0
+    end_ida_star = time()
+
     # Print table
     print("Heuristic\t\tTime (s)\tLongest Path")
     print("===============================================")
@@ -276,8 +326,9 @@ def main_heuristic_1(file: str):
     print(f"DFS\t\t\t\t{end_dfs - start_dfs:.6f}\t{L_max_dfs}")
     print(f"Dijkstra's\t\t{end_dijkstra - start_dijkstra:.6f}\t{L_max_dijkstra}")
     print(f"A*\t\t\t\t{end_astar - start_astar:.6f}\t{L_max_astar}")
+    print(f"IDA*\t\t\t{end_ida_star - start_ida_star:.6f}\t{L_maxIDAstar}")
 
 
 if __name__ == "__main__":
-    fileName = "inf-euroroad.edges"  # Path to the graph file
+    fileName = "graph.edges.txt"  # Path to the graph file
     main_heuristic_1(fileName)
