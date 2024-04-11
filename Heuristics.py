@@ -307,32 +307,34 @@ def main_heuristic_1(file: str):
     L_max_dfs = heuristics.DFS_BASED_LONGEST_SIMPLE_PATH()
     end_dfs = time()
 
-    # Calculate the longest path using Dijkstra's algorithm
-    start_dijkstra = time()
-    L_max_dijkstra = heuristics.dijkstra_max(heuristics.graph.V[0])
-    end_dijkstra = time()
-
-    # Calculate the longest path using A* algorithm
-    start_astar = time()
-    longest_path_astar = heuristics.aStar(heuristics.graph.V[0], heuristics.graph.V[-1])
-    L_max_astar = len(longest_path_astar) - 1  # Length of the path is one less than the number of vertices
-    end_astar = time()
-
-    start_ida_star = time()
-    path_ida_star = heuristics.ida_star(heuristics.graph.V[0], heuristics.graph.V[-1])
-    L_maxIDAstar = len(path_ida_star) - 1 if path_ida_star else 0
-    end_ida_star = time()
+    # # Calculate the longest path using Dijkstra's algorithm
+    # start_dijkstra = time()
+    # L_max_dijkstra = heuristics.dijkstra_max(heuristics.graph.V[0])
+    # end_dijkstra = time()
+    #
+    # # Calculate the longest path using A* algorithm
+    # start_astar = time()
+    # longest_path_astar = heuristics.aStar(heuristics.graph.V[0], heuristics.graph.V[-1])
+    # L_max_astar = len(longest_path_astar) - 1  # Length of the path is one less than the number of vertices
+    # end_astar = time()
+    #
+    # start_ida_star = time()
+    # path_ida_star = heuristics.ida_star(heuristics.graph.V[0], heuristics.graph.V[-1])
+    # L_maxIDAstar = len(path_ida_star) - 1 if path_ida_star else 0
+    # end_ida_star = time()
 
     # Print table
     print("Heuristic\t\tTime (s)\tLongest Path")
     print("===============================================")
     print(f"LCC (DFS_LCC)\t{end_lcc - start_lcc:.6f}\t{len(LCC)}")
     print(f"DFS\t\t\t\t{end_dfs - start_dfs:.6f}\t{L_max_dfs}")
-    print(f"Dijkstra's\t\t{end_dijkstra - start_dijkstra:.6f}\t{L_max_dijkstra}")
-    print(f"A*\t\t\t\t{end_astar - start_astar:.6f}\t{L_max_astar}")
-    print(f"IDA*\t\t\t{end_ida_star - start_ida_star:.6f}\t{L_maxIDAstar}")
+    # print(f"Dijkstra's\t\t{end_dijkstra - start_dijkstra:.6f}\t{L_max_dijkstra}")
+    # print(f"A*\t\t\t\t{end_astar - start_astar:.6f}\t{L_max_astar}")
+    # print(f"IDA*\t\t\t{end_ida_star - start_ida_star:.6f}\t{L_maxIDAstar}")
 
 
 if __name__ == "__main__":
-    fileName = "graph.edges.txt"  # Path to the graph file
+    fileName = "simple_graph_2.edges"  # Path to the graph file
     main_heuristic_1(fileName)
+
+# For DFS and inf-power file, we have DFS (longuest path): 5982 and LCC: 4941

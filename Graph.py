@@ -1,5 +1,5 @@
 import random
-
+from tqdm import tqdm
 
 class Vertex:
     """
@@ -190,7 +190,7 @@ class Graph:
         self.V, self.E = [], []  # Initialize lists for vertices (V) and edges (E)
         vertex_map = {}  # Map to track existing vertices by ID to ensure uniqueness
         with open(self.file, "r") as file:
-            for l in file.readlines():
+            for l in tqdm(file.readlines()):
                 line_split = l.split(" ")
                 u_id, v_id = int(line_split[0]), int(line_split[1])
 
