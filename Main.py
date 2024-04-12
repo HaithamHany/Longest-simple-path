@@ -2,6 +2,7 @@ from time import time
 
 from DFS import DFS
 from DijkstraMax import DijkstraMax
+from GraphMetrics import GraphMetrics
 from Heuristics import Heuristics
 from Graph import Graph
 
@@ -10,28 +11,28 @@ def lsp_test(file: str):
     g = Graph()
     g.read_edges_from_file(file)
 
-    #LCC
+    # LCC
     dfs = DFS(g)
     start_lcc = time()
     lcc = dfs.DFS_LCC()
     end_lcc = time()
     print("Largest Connected Component:", lcc)
 
-    #DFS
+    # DFS
     start_dfs = time()
-    lsp_length, lsp_path = dfs.find_lsp()
+    dfs_lsp_length, dfs_lsp_path = dfs.find_lsp()
     end_dfs = time()
-    print("Longest Simple Path Length:", lsp_length)
-    print("Longest Simple Path:", lsp_path)
+    print("Longest Simple Path Length:", dfs_lsp_length)
+    print("Longest Simple Path:", dfs_lsp_path)
 
-    #Dijkstra
+    # Dijkstra
     start_dijkstra = time()
     d = DijkstraMax(g)
     path, length = d.get_longest_path()
     end_dijkstra = time()
     print("The Longest Simple Path (LSP) is:", path, "with length:", length)
 
-    #A* and IDA*
+    # A* and IDA*
     h = Heuristics(g, lcc)
 
     start_astar = time()
@@ -46,15 +47,27 @@ def lsp_test(file: str):
     end_ida_star = time()
     print("IDA* Longest Simple Path:", ida_path)
 
-
     # Print table
     print("Heuristic\t\tTime (s)\tLongest Path")
     print("===============================================")
     print(f"LCC (DFS_LCC)\t{end_lcc - start_lcc:.6f}\t{len(lcc)} -> vertices count")
-    print(f"DFS\t\t\t\t{end_dfs - start_dfs:.6f}\t{lsp_length} -> edges count")
+    print(f"DFS\t\t\t\t{end_dfs - start_dfs:.6f}\t{dfs_lsp_length} -> edges count")
     print(f"Dijkstra's\t\t{end_dijkstra - start_dijkstra:.6f}\t{path} -> edges count")
     print(f"A*\t\t\t\t{end_astar - start_astar:.6f}\t{len(astar_lsp_path)}")
     print(f"IDA*\t\t\t{end_ida_star - start_ida_star:.6f}\t{len(ida_path)}")
+    print("===============================================")
+
+    # DFS Metrics
+    dfs_metrics = GraphMetrics(g, lcc, dfs_lsp_path)
+    dfs_metrics_results = dfs_metrics.print_all_metrics("DFS METRICS")
+    print(dfs_metrics_results)
+
+    print("===============================================")
+
+    # Dijkstra Metrics
+    dijkstra_metrics = GraphMetrics(g, lcc, dfs_lsp_path)
+    dijkstra_metrics_results = dijkstra_metrics.print_all_metrics("DIJKSTRA METRICS")
+    print(dijkstra_metrics_results)
 
 
 if __name__ == "__main__":
