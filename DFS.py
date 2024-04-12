@@ -61,7 +61,7 @@ class DFS:
 
         return self.lsp_length - 1, self.lsp_path
 
-
+"""
 # Example usage
 g = Graph()
 g.read_edges_from_file('graph.Edges.txt')
@@ -73,3 +73,5 @@ print("Largest Connected Component:", lcc)
 lsp_length, lsp_path = dfs.find_lsp()
 print("Longest Simple Path Length:", lsp_length)
 print("Longest Simple Path:", lsp_path)
+"""
+
