@@ -9,7 +9,10 @@ from Graph import Graph
 
 def lsp_test(file: str):
     g = Graph()
-    g.read_edges_from_file(file)
+    #g.read_edges_from_file(file)
+
+#OR
+    g.generate_random_geometric_graph_full(15, 0.5)
 
     # LCC
     dfs = DFS(g)
@@ -28,9 +31,9 @@ def lsp_test(file: str):
     # Dijkstra
     start_dijkstra = time()
     d = DijkstraMax(g)
-    path, length = d.get_longest_path()
+    dijkstra_path, dijkstra_length = d.get_longest_path()
     end_dijkstra = time()
-    print("The Longest Simple Path (LSP) is:", path, "with length:", length)
+    print("The Longest Simple Path (LSP) is:", dijkstra_path, "with length:", dijkstra_length)
 
     # A* and IDA*
     h = Heuristics(g, lcc)
@@ -52,7 +55,7 @@ def lsp_test(file: str):
     print("===============================================")
     print(f"LCC (DFS_LCC)\t{end_lcc - start_lcc:.6f}\t{len(lcc)} -> vertices count")
     print(f"DFS\t\t\t\t{end_dfs - start_dfs:.6f}\t{dfs_lsp_length} -> edges count")
-    print(f"Dijkstra's\t\t{end_dijkstra - start_dijkstra:.6f}\t{path} -> edges count")
+    print(f"Dijkstra's\t\t{end_dijkstra - start_dijkstra:.6f}\t{dijkstra_path} -> edges count")
     print(f"A*\t\t\t\t{end_astar - start_astar:.6f}\t{len(astar_lsp_path)}")
     print(f"IDA*\t\t\t{end_ida_star - start_ida_star:.6f}\t{len(ida_path)}")
     print("===============================================")
@@ -65,7 +68,7 @@ def lsp_test(file: str):
     print("===============================================")
 
     # Dijkstra Metrics
-    dijkstra_metrics = GraphMetrics(g, lcc, dfs_lsp_path)
+    dijkstra_metrics = GraphMetrics(g, lcc, dijkstra_length)
     dijkstra_metrics_results = dijkstra_metrics.print_all_metrics("DIJKSTRA METRICS")
     print(dijkstra_metrics_results)
 

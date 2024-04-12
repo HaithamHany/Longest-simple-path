@@ -58,9 +58,10 @@ class DijkstraMax:
 
         return longest_path_length, longest_path
 
-
+'''
 g = Graph()
 g.read_edges_from_file('graph.Edges.txt')
 d = DijkstraMax(g)
 path, length = d.get_longest_path()
 print("The Longest Simple Path (LSP) is:", path, "with length:", length)
+'''

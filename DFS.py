@@ -46,7 +46,7 @@ class DFS:
                 self.predecessor[next_vertex] = vertex
                 self.dfs_visit(next_vertex, current_length, current_path, component)
 
-        self.color[vertex] = 'WHITE'
+        self.color[vertex] = 'BLACK'  #indicate full exploration of this vertex
         if current_path is not None:
             current_path.pop()
 

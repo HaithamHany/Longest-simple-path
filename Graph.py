@@ -14,11 +14,11 @@ class Graph:
             self.vertices[v] = []
             self.coordinates[v] = (x, y)
 
-
     def add_edge(self, u, v):
-            if u in self.vertices:
+        if u in self.vertices and v in self.vertices:
+            if v not in self.vertices[u]:
                 self.vertices[u].append(v)
-            if v in self.vertices:
+            if u not in self.vertices[v]:
                 self.vertices[v].append(u)
 
     def get_coordinates(self, vertex):
@@ -58,14 +58,13 @@ class Graph:
         return math.sqrt((coord1[0] - coord2[0]) ** 2 + (coord1[1] - coord2[1]) ** 2)
 
     def write_to_file(self, file_path):
-        """Write the edges of the graph to a file, including the coordinates of the vertices."""
         with open(file_path, 'w') as file:
             for vertex, edges in self.vertices.items():
+                ux, uy = self.coordinates[vertex]
                 for edge in edges:
-                    u, v = vertex, edge
-                    ux, uy = self.coordinates[u]
-                    vx, vy = self.coordinates[v]
-                    file.write(f"{u} {ux} {uy} {v} {vx} {vy}\n")
+                    if vertex < edge:  # Ensure each edge is written only once
+                        vx, vy = self.coordinates[edge]
+                        file.write(f"{vertex} {ux} {uy} {edge} {vx} {vy}\n")
 
     def read_edges_with_coordinates_from_file(self, file_path):
         with open(file_path, 'r') as file:

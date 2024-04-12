@@ -116,17 +116,17 @@ class Heuristics:
 
 
 #Example
-g = Graph()
-g.read_edges_from_file('graph.Edges.txt')
-dfs = DFS(g)
-lcc = dfs.DFS_LCC()
-h = Heuristics(g, lcc)
+#g = Graph()
+#g.read_edges_from_file('graph.Edges.txt')
+#dfs = DFS(g)
+#lcc = dfs.DFS_LCC()
+#h = Heuristics(g, lcc)
 
-s, d = lcc[0], lcc[-1]  # example vertices
-lsp_path = h.aStar_longest_path(s, d)
-print("Longest Simple Path:", lsp_path)
+#s, d = lcc[0], lcc[-1]  # example vertices
+#lsp_path = h.aStar_longest_path(s, d)
+#print("Longest Simple Path:", lsp_path)
 
-start, goal = lcc[0], lcc[-1]
+#start, goal = lcc[0], lcc[-1]
 
-ida_path = h.ida_star_longest_path(start, goal)
-print("IDA* Longest Simple Path:", ida_path)
+#ida_path = h.ida_star_longest_path(start, goal)
+#print("IDA* Longest Simple Path:", ida_path#
