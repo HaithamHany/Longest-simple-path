@@ -1,5 +1,5 @@
 import heapq
-from NewGraph import Graph
+from Graph import Graph
 from PriorityQueueNode import PriorityQueueNode
 
 

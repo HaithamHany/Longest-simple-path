@@ -2,7 +2,7 @@ import heapq
 import math
 
 from DFS import DFS
-from NewGraph import Graph
+from Graph import Graph
 
 class Heuristics:
     def __init__(self, graph, lcc):

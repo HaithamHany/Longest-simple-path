@@ -3,7 +3,7 @@ from time import time
 from DFS import DFS
 from DijkstraMax import DijkstraMax
 from Heuristics import Heuristics
-from NewGraph import Graph
+from Graph import Graph
 
 
 def lsp_test(file: str):

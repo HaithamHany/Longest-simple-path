@@ -2,7 +2,7 @@ from collections import defaultdict
 import math
 from random import choice
 
-from NewGraph import Graph
+from Graph import Graph
 
 
 class DFS:
