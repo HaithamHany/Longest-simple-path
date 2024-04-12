@@ -1,6 +1,3 @@
-from DijkstraMax import DijkstraMax
-
-
 class Graph:
     def __init__(self):
         self.vertices = {}
