@@ -5,15 +5,48 @@ from DijkstraMax import DijkstraMax
 from GraphMetrics import GraphMetrics
 from Heuristics import Heuristics
 from Graph import Graph
+import random
+from Graph import Graph
+from Heuristics import Heuristics as h
+from math import sqrt
 
 
-def lsp_test(file: str):
+def binary_search(n, interval, filename: str):
     g = Graph()
-    #g.read_edges_from_file(file)
+    left, right = 0, sqrt(2)
+    success = False
 
-#OR
-    g.generate_random_geometric_graph_full(15, 0.5)
+    while right - left > 1e-6:  # Binary search tolerance
+        r = (left + right) / 2
+        g.generate_random_geometric_graph_full(n, r, filename)
+        dfs = DFS(graph=g)
+        lcc = dfs.DFS_LCC()  # Returns the list of nodes in the LCC
+        VLCC = len(lcc)
 
+        if interval[0] * n <= VLCC <= interval[1] * n:
+            success = True
+            print(f"Graph with n={n}, r={r:.4f}, VLCC={VLCC:.4f}")
+            break
+        elif VLCC < interval[0] * n:
+            left = r
+        else:
+            right = r
+    if not success:
+        print("Failed to generate graph that satisfies the VLCC condition")
+
+
+def create_random_graphs():
+    conditions = [(300, [0.9, 0.95]), (400, [0.8, 0.9]), (500, [0.7, 0.8])]
+    file_name = ["random_geometric_graph_OUTPUT_1.edges", "random_geometric_graph_OUTPUT_2.edges",
+                 "random_geometric_graph_OUTPUT_3.edges"]
+    for i, (n, interval) in enumerate(conditions):
+        binary_search(n, interval, file_name[i])
+
+
+def lsp_test(file: str = None):
+    g = Graph()
+    g.read_edges_with_coordinates_from_file(file) if file is not None else g.generate_random_geometric_graph_full(15,
+                                                                                                                  0.5)
     # LCC
     dfs = DFS(g)
     start_lcc = time()
@@ -74,5 +107,6 @@ def lsp_test(file: str):
 
 
 if __name__ == "__main__":
-    fileName = "graph.edges.txt"  # Path to the graph file
+    #create_random_graphs()  # Creating the graphs for the project requirements
+    fileName = "random_geometric_graph_OUTPUT_2.edges"  # Path to the graph file
     lsp_test(fileName)
