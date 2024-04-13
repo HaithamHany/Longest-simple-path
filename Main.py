@@ -1,5 +1,6 @@
 from time import time
-
+import sys
+sys.setrecursionlimit(1500)
 from DFS import DFS
 from DijkstraMax import DijkstraMax
 from GraphMetrics import GraphMetrics
@@ -112,5 +113,5 @@ def lsp_test(file: str = None):
 
 if __name__ == "__main__":
     #create_random_graphs()  # Creating the graphs for the project requirements
-    fileName = "Graphs/inf-euroroad.edges"  # Path to the graph file
+    fileName = "Graphs/inf-power.mtx"  # Path to the graph file
     lsp_test(fileName)
