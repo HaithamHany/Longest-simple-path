@@ -90,8 +90,8 @@ class Graph:
 
     def generate_random_geometric_graph_full(self, n ,r, filename=None):
         self.generate_random_geometric_graph(n, r)
-        self.write_to_file('random_geometric_graph_OUTPUT.edges' if filename is None else filename)
-        self.read_edges_with_coordinates_from_file('random_geometric_graph_OUTPUT.edges' if filename is None else
+        self.write_to_file('Graphs/random_geometric_graph_OUTPUT.edges' if filename is None else filename)
+        self.read_edges_with_coordinates_from_file('Graphs/random_geometric_graph_OUTPUT.edges' if filename is None else
                                                    filename)
 
 

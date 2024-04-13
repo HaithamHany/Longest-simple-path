@@ -45,8 +45,12 @@ def create_random_graphs():
 
 def lsp_test(file: str = None):
     g = Graph()
-    g.read_edges_with_coordinates_from_file(file) if file is not None else g.generate_random_geometric_graph_full(15,
+    try:
+        g.read_edges_with_coordinates_from_file(file) if file is not None else g.generate_random_geometric_graph_full(15,
                                                                                                                   0.5)
+    except IndexError:
+        g.read_edges_from_file(file)
+
     # LCC
     dfs = DFS(g)
     start_lcc = time()
@@ -62,35 +66,35 @@ def lsp_test(file: str = None):
     print("Longest Simple Path:", dfs_lsp_path)
 
     # Dijkstra
-    start_dijkstra = time()
-    d = DijkstraMax(g)
-    dijkstra_path, dijkstra_length = d.get_longest_path()
-    end_dijkstra = time()
-    print("The Longest Simple Path (LSP) is:", dijkstra_path, "with length:", dijkstra_length)
+    # start_dijkstra = time()
+    # d = DijkstraMax(g)
+    # dijkstra_path, dijkstra_length = d.get_longest_path()
+    # end_dijkstra = time()
+    # print("The Longest Simple Path (LSP) is:", dijkstra_path, "with length:", dijkstra_length)
 
-    # A* and IDA*
-    h = Heuristics(g, lcc)
-
-    start_astar = time()
-    s, d = lcc[0], lcc[-1]
-    astar_lsp_path = h.aStar_longest_path(s, d)
-    end_astar = time()
-    print("Longest Simple Path:", astar_lsp_path)
-
-    start_ida_star = time()
-    start, goal = lcc[0], lcc[-1]
-    ida_path = h.ida_star_longest_path(start, goal)
-    end_ida_star = time()
-    print("IDA* Longest Simple Path:", ida_path)
+    # # A* and IDA*
+    # h = Heuristics(g, lcc)
+    #
+    # start_astar = time()
+    # s, d = lcc[0], lcc[-1]
+    # astar_lsp_path = h.aStar_longest_path(s, d)
+    # end_astar = time()
+    # print("Longest Simple Path:", astar_lsp_path)
+    #
+    # start_ida_star = time()
+    # start, goal = lcc[0], lcc[-1]
+    # ida_path = h.ida_star_longest_path(start, goal)
+    # end_ida_star = time()
+    # print("IDA* Longest Simple Path:", ida_path)
 
     # Print table
     print("Heuristic\t\tTime (s)\tLongest Path")
     print("===============================================")
     print(f"LCC (DFS_LCC)\t{end_lcc - start_lcc:.6f}\t{len(lcc)} -> vertices count")
     print(f"DFS\t\t\t\t{end_dfs - start_dfs:.6f}\t{dfs_lsp_length} -> edges count")
-    print(f"Dijkstra's\t\t{end_dijkstra - start_dijkstra:.6f}\t{dijkstra_path} -> edges count")
-    print(f"A*\t\t\t\t{end_astar - start_astar:.6f}\t{len(astar_lsp_path)}")
-    print(f"IDA*\t\t\t{end_ida_star - start_ida_star:.6f}\t{len(ida_path)}")
+    # print(f"Dijkstra's\t\t{end_dijkstra - start_dijkstra:.6f}\t{dijkstra_path} -> edges count")
+    # print(f"A*\t\t\t\t{end_astar - start_astar:.6f}\t{len(astar_lsp_path)}")
+    # print(f"IDA*\t\t\t{end_ida_star - start_ida_star:.6f}\t{len(ida_path)}")
     print("===============================================")
 
     # DFS Metrics
@@ -100,13 +104,13 @@ def lsp_test(file: str = None):
 
     print("===============================================")
 
-    # Dijkstra Metrics
-    dijkstra_metrics = GraphMetrics(g, lcc, dijkstra_length)
-    dijkstra_metrics_results = dijkstra_metrics.print_all_metrics("DIJKSTRA METRICS")
-    print(dijkstra_metrics_results)
+    # # Dijkstra Metrics
+    # dijkstra_metrics = GraphMetrics(g, lcc, dijkstra_length)
+    # dijkstra_metrics_results = dijkstra_metrics.print_all_metrics("DIJKSTRA METRICS")
+    # print(dijkstra_metrics_results)
 
 
 if __name__ == "__main__":
     #create_random_graphs()  # Creating the graphs for the project requirements
-    fileName = "random_geometric_graph_OUTPUT_2.edges"  # Path to the graph file
+    fileName = "Graphs/inf-euroroad.edges"  # Path to the graph file
     lsp_test(fileName)
