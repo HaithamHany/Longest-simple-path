@@ -1,8 +1,10 @@
 import heapq
 import math
+from PriorityQueueNode import PriorityQueueNode
 
 from DFS import DFS
 from Graph import Graph
+
 
 class Heuristics:
     def __init__(self, graph, lcc):
@@ -12,6 +14,10 @@ class Heuristics:
     def euclidean_distance(self, coord1, coord2):
         return math.sqrt((coord1[0] - coord2[0]) ** 2 + (coord1[1] - coord2[1]) ** 2)
 
+    def modified_heuristic(self, current, target):
+        return 1 / (1 + self.euclidean_distance(self.graph.get_coordinates(current),
+                                                self.graph.get_coordinates(target)))
+
     def edge_length(self, u, v):
         coord_u = self.graph.get_coordinates(u)
         coord_v = self.graph.get_coordinates(v)
@@ -19,22 +25,16 @@ class Heuristics:
 
     def aStar_longest_path(self, s, d):
         if s not in self.lcc or d not in self.lcc:
-            return None  # Ensure both s and d are in the LCC
+            return None
 
-        # Initialize distances and heuristics limited to the LCC
         distances = {vertex: float('-inf') for vertex in self.lcc}
-        heuristic = {vertex: self.euclidean_distance(self.graph.get_coordinates(vertex), self.graph.get_coordinates(d))
-                     for vertex in self.lcc}
+        heuristic = {vertex: self.modified_heuristic(vertex, d) for vertex in self.lcc}
         distances[s] = 0
 
-        # Priority queue
         queue = []
-        heapq.heappush(queue, (-(distances[s] + heuristic[s]), s))
+        heapq.heappush(queue, (-(distances[s] + heuristic[s]), s))  # Maximize path length
 
-        # Set of visited nodes to avoid revisiting
         visited = set()
-
-        # Predecessor map to reconstruct the path later
         predecessor = {vertex: None for vertex in self.lcc}
 
         while queue:
@@ -43,81 +43,104 @@ class Heuristics:
             if current == d:
                 break
 
-            # Explore neighbors within the LCC
             for neighbor in self.graph.vertices[current]:
                 if neighbor in self.lcc and neighbor not in visited:
                     new_distance = distances[current] + self.edge_length(current, neighbor)
                     if new_distance > distances[neighbor]:
                         distances[neighbor] = new_distance
                         predecessor[neighbor] = current
-                        priority = -(new_distance + heuristic[neighbor])
+                        priority = -(new_distance + heuristic[neighbor])  # Higher values are more prioritized
                         heapq.heappush(queue, (priority, neighbor))
 
-        # Reconstruct the path from s to d
         path = []
         step = d
         while step is not None:
             path.append(step)
             step = predecessor[step]
         path.reverse()
-
         return path
 
-    def ida_star_longest_path(self, start, goal):
-        """Find the longest simple path from start to goal using IDA* within the LCC."""
-        if start not in self.lcc or goal not in self.lcc:
-            return None  # Ensure start and goal are within the LCC
+    def find_longest_simple_path(self):
+        longest_path = []
+        longest_path_length = 0
 
-        threshold = self.euclidean_distance(self.graph.get_coordinates(start), self.graph.get_coordinates(goal))
+        for start_vertex in self.lcc:
+            for end_vertex in self.lcc:
+                if start_vertex != end_vertex:
+                    path = self.aStar_longest_path(start_vertex, end_vertex)
+                    if path:
+                        path_length = sum(self.edge_length(path[i], path[i + 1]) for i in range(len(path) - 1))
+                        if path_length > longest_path_length:
+                            longest_path_length = path_length
+                            longest_path = path
+
+        return longest_path_length, longest_path
+
+    def ida_star_longest_path(self, start, goal):
+        if start not in self.lcc or goal not in self.lcc:
+            return None
+
+        threshold = 0  # Start with a low threshold since we are maximizing
         path = [start]
         visited = set(path)
 
         while True:
             temp = self.search(path, 0, threshold, goal, visited)
-            if isinstance(temp, list):  # If a valid path is found
+            if isinstance(temp, list):
                 return temp
-            if temp == float('inf'):  # If no path found within threshold
+            if temp == float('-inf'):
                 return None
-            threshold = temp  # Update the threshold
+            threshold = temp
 
     def search(self, path, g, threshold, goal, visited):
-        """Helper function for IDA* search."""
         current = path[-1]
-        f = g + self.euclidean_distance(self.graph.get_coordinates(current), self.graph.get_coordinates(goal))
+        f = g - self.modified_heuristic(current, goal)
 
-        # Check if current f value exceeds the threshold
         if f > threshold:
             return f
-
-        # Check if the goal is reached
         if current == goal:
             return path
 
-        # Set minimum cost estimate for the next iteration
-        min_cost = float('inf')
-
-        # Explore each neighbor within the LCC
+        max_cost = float('-inf')
         for neighbor in self.graph.vertices[current]:
             if neighbor in self.lcc and neighbor not in visited:
                 path.append(neighbor)
                 visited.add(neighbor)
                 t = self.search(path, g + self.edge_length(current, neighbor), threshold, goal, visited)
-
-                if isinstance(t, list):  # Path found
+                if isinstance(t, list):
                     return t
-                if t < min_cost:  # Update minimum cost if new cost is lower
-                    min_cost = t
-
-                # Backtrack
+                if t > max_cost:
+                    max_cost = t
                 path.pop()
                 visited.remove(neighbor)
 
-        return min_cost
+        return max_cost
+
+    def find_longest_path_ida_star(self):
+        longest_path = []
+        longest_path_length = 0
+        checked_pairs = set()  # Set to track checked start-goal pairs
+
+        for start in self.lcc:
+            for goal in self.lcc:
+                if start != goal and (start, goal) not in checked_pairs:
+                    # Add both directions to the set because path length from start to goal is the same as from goal to start
+                    checked_pairs.add((start, goal))
+                    checked_pairs.add((goal, start))
+
+                    path = self.ida_star_longest_path(start, goal)
+                    if path:
+                        path_length = len(path) - 1  # Length in terms of number of edges
+                        if path_length > longest_path_length:
+                            longest_path_length = path_length
+                            longest_path = path
+
+        return longest_path_length, longest_path
 
 
 #Example
 #g = Graph()
-#g.read_edges_from_file('graph.Edges.txt')
+#g.read_edges_from_file('self.graph.Edges.txt')
 #dfs = DFS(g)
 #lcc = dfs.DFS_LCC()
 #h = Heuristics(g, lcc)
