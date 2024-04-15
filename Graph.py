@@ -97,10 +97,3 @@ class Graph:
 
 
 
-
-
-#g = Graph()
-#radius = 0.1  # You would find the correct r value as per your requirements
-#number_of_vertices = 300  # As an example
-#g.generate_random_geometric_graph(10, 0.1)
-#g.write_to_file('random_geometric_graph_TEST.edges')
