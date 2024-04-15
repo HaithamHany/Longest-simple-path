@@ -2,14 +2,12 @@ from time import time
 import sys
 from DFS import DFS
 from DijkstraMax import DijkstraMax
+from Grasp import Grasp
+from aStar import aStar
 from GraphMetrics import GraphMetrics
-from Heuristics import Heuristics
 from Graph import Graph
-import random
-from Graph import Graph
-from Heuristics import Heuristics as h
 from math import sqrt
-sys.setrecursionlimit(3000)
+sys.setrecursionlimit(1500)
 
 
 def binary_search(n, interval, filename: str):
@@ -45,71 +43,85 @@ def create_random_graphs():
 
 
 def lsp_test(file: str = None):
+    # Initialize the graph and read edges from file
     g = Graph()
-    g.read_edges_with_coordinates_from_file('random_geometric_graph_OUTPUT.edges')
+    g.generate_random_geometric_graph(100, 0.1)
 
-    # LCC
+    # LCC (DFS_LCC)
     dfs = DFS(g)
     start_lcc = time()
     lcc = dfs.DFS_LCC()
     end_lcc = time()
     print("Largest Connected Component:", lcc)
 
+    # DijkstraMax
+    dijkstra = DijkstraMax(g)
+    start_dijkstra = time()
+    dijkstra_length, dijkstra_path = dijkstra.get_longest_path()
+    end_dijkstra = time()
+    print("Dijkstra's Longest Simple Path Length:", dijkstra_length)
+    print("Dijkstra's Longest Simple Path:", dijkstra_path)
+
     # DFS
     start_dfs = time()
     dfs_lsp_length, dfs_lsp_path = dfs.find_lsp()
     end_dfs = time()
-    print("Longest Simple Path Length:", dfs_lsp_length)
-    print("Longest Simple Path:", dfs_lsp_path)
+    print("DFS Longest Simple Path Length:", dfs_lsp_length)
+    print("DFS Longest Simple Path:", dfs_lsp_path)
 
-    # Dijkstra
-    start_dijkstra = time()
-    d = DijkstraMax(g)
-    dijkstra_path, dijkstra_length = d.get_longest_path()
-    end_dijkstra = time()
-    print("The Longest Simple Path (LSP) is:", dijkstra_path, "with length:", dijkstra_length)
-    # A* and IDA*
-    h = Heuristics(g, lcc)
-
+    # A*
+    astar = aStar(g, lcc)
     start_astar = time()
-    astar_length, astar_lsp_path = h.find_longest_simple_path()
+    astar_length, astar_lsp_path = astar.find_longest_simple_path()
     end_astar = time()
-    print("The Longest Simple Path (LSP) is:", len(astar_lsp_path), "with length:", astar_lsp_path)
+    print("A* Longest Simple Path Length:", len(astar_lsp_path))
+    print("A* Longest Simple Path:", astar_lsp_path)
 
-    # start_ida_star = time()
-    # ida_star_length, ida_star_lsp_path = h.find_longest_path_ida_star()
-    # end_ida_star = time()
-    # print("The Longest Simple Path (LSP) is:", ida_star_length, "with length:", ida_star_lsp_path)
+    # GRASP
+    grasp = Grasp(g, lcc)
+    start_grasp = time()
+    grasp_lsp_path = grasp.grasp_longest_path()
+    end_grasp = time()
+    print("GRASP Longest Simple Path Length:", len(grasp_lsp_path))
+    print("GRASP Longest Simple Path:", grasp_lsp_path)
 
-    # Print table
-    print("Heuristic\t\tTime (s)\tLongest Path")
+    # Print the table with results
+    print("\nHeuristic\t\tTime (s)\tLongest Path Length")
     print("===============================================")
     print(f"LCC (DFS_LCC)\t{end_lcc - start_lcc:.6f}\t{len(lcc)} -> vertices count")
+    print(f"Dijkstra's\t\t{end_dijkstra - start_dijkstra:.6f}\t{dijkstra_length} -> edges count")
     print(f"DFS\t\t\t\t{end_dfs - start_dfs:.6f}\t{dfs_lsp_length} -> edges count")
-    print(f"Dijkstra's\t\t{end_dijkstra - start_dijkstra:.6f}\t{dijkstra_path} -> edges count")
     print(f"A*\t\t\t\t{end_astar - start_astar:.6f}\t{len(astar_lsp_path)} -> vertices count")
-    # print(f"IDA*\t\t\t{end_ida_star - start_ida_star:.6f}\t{ida_star_length}")
+    print(f"GRASP\t\t\t{end_grasp - start_grasp:.6f}\t{len(grasp_lsp_path)} -> vertices count")
     print("===============================================")
 
-    # A* Metrics
-    a_star_metrics = GraphMetrics(g, lcc, astar_lsp_path)
-    aStar_metrics_results = a_star_metrics.print_all_metrics("A* Metrics")
-    print(aStar_metrics_results)
-
+    # Calculate and print metrics for each method
+    print("\nMetrics:")
     print("===============================================")
-
-    # IDA* Metrics
-    # ida_star_metrics = GraphMetrics(g, lcc, ida_star_lsp_path)
-    # idaStar_metrics_results = ida_star_metrics.print_all_metrics("IDA* Metrics")
-    # print(idaStar_metrics_results)
-
-    # print("===============================================")
-
-    # # Dijkstra Metrics
-    # dijkstra_metrics = GraphMetrics(g, lcc, dijkstra_length)
-    # dijkstra_metrics_results = dijkstra_metrics.print_all_metrics("DIJKSTRA METRICS")
-    # print(dijkstra_metrics_results)
-
+    # Metrics for LCC (DFS_LCC)
+    lcc_metrics = GraphMetrics(g, lcc, [])
+    lcc_metrics_results = lcc_metrics.print_all_metrics("LCC Metrics")
+    print(lcc_metrics_results)
+    print("===============================================")
+    # Metrics for DijkstraMax
+    dijkstra_metrics = GraphMetrics(g, lcc, dijkstra_path)
+    dijkstra_metrics_results = dijkstra_metrics.print_all_metrics("DijkstraMax Metrics")
+    print(dijkstra_metrics_results)
+    print("===============================================")
+    # Metrics for DFS
+    dfs_metrics = GraphMetrics(g, lcc, dfs_lsp_path)
+    dfs_metrics_results = dfs_metrics.print_all_metrics("DFS Metrics")
+    print(dfs_metrics_results)
+    print("===============================================")
+    # Metrics for A*
+    astar_metrics = GraphMetrics(g, lcc, astar_lsp_path)
+    astar_metrics_results = astar_metrics.print_all_metrics("A* Metrics")
+    print(astar_metrics_results)
+    print("===============================================")
+    # Metrics for GRASP
+    grasp_metrics = GraphMetrics(g, lcc, grasp_lsp_path)
+    grasp_metrics_results = grasp_metrics.print_all_metrics("GRASP Metrics")
+    print(grasp_metrics_results)
 
 if __name__ == "__main__":
     #create_random_graphs()  # Creating the graphs for the project requirements
