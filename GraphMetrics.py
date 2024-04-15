@@ -16,14 +16,20 @@ class GraphMetrics:
         return len(self.lcc)
 
     def max_degree(self):
+        if not self.lcc:
+            return 0
         # Returns the maximum degree of any node in the largest connected component.
         return max(len(self.graph.vertices[node]) for node in self.lcc)
 
     def average_degree(self):
+        if not self.lcc:
+            return 0
         # Returns the average degree of nodes in the largest connected component.
         return sum(len(self.graph.vertices[node]) for node in self.lcc) / len(self.lcc)
 
     def lsp_length(self):
+        if not self.lcc:
+            return 0
         # Returns the length of the longest simple path found in the LCC.
         return len(self.lsp) - 1
 
