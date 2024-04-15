@@ -1,96 +1,105 @@
-
-import math
-import random
-
-
 class Graph:
-    def __init__(self):
-        self.vertices = {}
-        self.coordinates = {}
+    """
+    Represents a graph structure loaded from a file. This graph supports operations like reading from a file,
+    resetting vertices, finding adjacent vertices, and printing the graph's vertices and edges.
 
-    def add_vertex(self, v):
-        if v not in self.vertices:
-            x = random.random()  # Random x-coordinate between 0 and 1
-            y = random.random()  # Random y-coordinate between 0 and 1
-            self.vertices[v] = []
-            self.coordinates[v] = (x, y)
+    Attributes:
+        file (str): The path to the file from which the graph is read.
+        verbose (int): Determines the verbosity of the string representation. If 1, edges are included.
+    """
 
-    def add_edge(self, u, v):
-        if u in self.vertices and v in self.vertices:
-            if v not in self.vertices[u]:
-                self.vertices[u].append(v)
-            if u not in self.vertices[v]:
-                self.vertices[v].append(u)
+    def __init__(self, file, verbose=0):
+        """
+        Initializes the Graph instance by reading from the specified file.
 
-    def get_coordinates(self, vertex):
-        return self.coordinates.get(vertex, (None, None))  # Return None if vertex doesn't exist
+        Parameters:
+            file (str): The path to the file from which the graph is to be read.
+            verbose (int, optional): Level of detail for string representation. Defaults to 0.
 
-    def read_edges_from_file(self, file_path):
-        with open(file_path, 'r') as file:
-            for line in file:
-                u, v = map(int, line.strip().split())  # Adjust split() accordingly if using a different delimiter
-                if u not in self.vertices:
-                    self.add_vertex(u)
-                if v not in self.vertices:
-                    self.add_vertex(v)
-                self.add_edge(u, v)
+        Raises:
+            ValueError: If the file path is not specified.
+        """
+        self.file = file
+        self.time = 0  # Placeholder for potential future use, e.g., for graph algorithms that use timing
+        self.verbose = verbose
+        if file is not None:
+            self._read_graph()  # Private method to read the graph structure from the file
+        else:
+            raise ValueError("File must be specified.")
 
-# New method to initialize or reset vertex properties
-    def initialize_vertex_properties(self):
-        self.vertex_properties = {v: {'color': 'WHITE', 'd': 0, 'f': 0, 'pi': None} for v in self.vertices}
+    def _read_graph(self):
+        """
+        Private method to read the graph's vertices and edges from a file specified by `self.file`.
+        """
+        self.V, self.E = [], []  # Initialize lists for vertices (V) and edges (E)
+        with open(self.file, "r") as file:
+            f = file.readlines()
+        for l in f:
+            line_split = l.split(" ")
+            u = Vertex(id=int(line_split[0]))  # Assumes existence of a Vertex class with an 'id' attribute
+            v = Vertex(id=int(line_split[1]))
+            e = Edge(vertex_u=u, vertex_v=v)  # Assumes existence of an Edge class
+            if e not in self.E:
+                self.E.append(e)
+            if u not in self.V:
+                self.V.append(u)
+            if v not in self.V:
+                self.V.append(v)
 
-    def generate_random_geometric_graph(self, n, r):
-        """Generate a random geometric graph with n vertices and connection radius r."""
-        self.vertices = {}
-        self.coordinates = {}
+    def reset_vertices(self):
+        """
+        Resets all vertices in the graph, assuming a reset method is defined for Vertex instances.
+        Also resets vertices associated with each edge.
+        """
+        for v in self.V:
+            v.reset()  # Assumes a reset method in Vertex
+        for e in self.E:
+            e.vertex_u.reset()
+            e.vertex_v.reset()
 
-        # Add vertices
-        for i in range(n):
-            self.add_vertex(i)
+    def Adj(self, v):
+        """
+        Finds all vertices adjacent to a given vertex.
 
-        # Add edges
-        for u in self.vertices:
-            for v in self.vertices:
-                if u != v and self.euclidean_distance(self.coordinates[u], self.coordinates[v]) < r:
-                    self.add_edge(u, v)
+        Parameters:
+            v (Vertex): The vertex to find the adjacents for.
 
-    def euclidean_distance(self, coord1, coord2):
-        """Calculate the Euclidean distance between two coordinates."""
-        return math.sqrt((coord1[0] - coord2[0]) ** 2 + (coord1[1] - coord2[1]) ** 2)
+        Returns:
+            list: A list of vertices adjacent to `v`.
+        """
+        Adj_v = []
+        for e in self.E:
+            if e.vertex_u == v:
+                Adj_v.append(e.vertex_v)
+            elif e.vertex_v == v:
+                Adj_v.append(e.vertex_u)
+        return Adj_v
 
-    def write_to_file(self, file_path):
-        with open(file_path, 'w') as file:
-            for vertex, edges in self.vertices.items():
-                ux, uy = self.coordinates[vertex]
-                for edge in edges:
-                    if vertex < edge:  # Ensure each edge is written only once
-                        vx, vy = self.coordinates[edge]
-                        file.write(f"{vertex} {ux} {uy} {edge} {vx} {vy}\n")
+    def __str__(self):
+        """
+        Provides a string representation of the graph, optionally including edges based on the verbose attribute.
 
-    def read_edges_with_coordinates_from_file(self, file_path):
-        with open(file_path, 'r') as file:
-            for line in file:
-                # Expecting each line to have the format: u x1 y1 v x2 y2
-                parts = line.strip().split()
-                u, (x1, y1), v, (x2, y2) = int(parts[0]), (float(parts[1]), float(parts[2])), int(parts[3]), (
-                float(parts[4]), float(parts[5]))
+        Returns:
+            str: A string representation of the graph.
+        """
+        s = "-------- Graph Vertices --------\n"
+        for v in self.V:
+            s += str(v) + '\n'
+        if self.verbose == 1:
+            s += "-------- Graph Edges --------\n"
+            for e in self.E:
+                s += str(e) + '\n'
+        return s
 
-                # Add vertices with coordinates if they don't already exist
-                if u not in self.vertices:
-                    self.add_vertex_with_coordinates(u, (x1, y1))
-                if v not in self.vertices:
-                    self.add_vertex_with_coordinates(v, (x2, y2))
+    def __contains__(self, n):
+        """
+        Checks if a vertex is part of the graph.
 
-                # Add edge between u and v
-                self.add_edge(u, v)
+        Parameters:
+            n (Vertex): The vertex to check.
 
-    def add_vertex_with_coordinates(self, v, coords):
-        if v not in self.vertices:
-            self.vertices[v] = []
-            self.coordinates[v] = coords
+        Returns:
+            bool: True if `n` is in the graph's vertices, False otherwise.
+        """
+        return n in self.V
 
-    def generate_random_geometric_graph_full(self, n ,r, filename=None):
-        self.generate_random_geometric_graph(n, r)
-        self.write_to_file('random_geometric_graph_OUTPUT.edges' if filename is None else filename)
-        self.read_edges_with_coordinates_from_file('random_geometric_graph_OUTPUT.edges' if filename is None else
-                                                   filename)

@@ -30,10 +30,12 @@ def main():
     v, e = generate_geometric_graph(10, 0.7)
 
     with open('graph.edges', 'w') as f:
+        # # Write vertices
+        # for i, vertex in enumerate(v):
+        #     f.write(f"v {i} {vertex[0]} {vertex[1]}\n")
         # Write edges
         for edge in e:
             f.write(f"{edge[0]} {edge[1]}\n")
-
 
 if __name__ == '__main__':
     main()
