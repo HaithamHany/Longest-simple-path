@@ -18,7 +18,7 @@ class DijkstraMax:
         if self.distances[v] < self.distances[u] + 1:
             self.distances[v] = self.distances[u] + 1
             self.predecessors[v] = u
-            heapq.heappush(self.Q, PriorityQueueNode(v, self.distances[v]))
+            heapq.heappush(self.Q, PriorityQueueNode(v, -self.distances[v]))
 
     def dijkstra_max(self, s):
         self.initialize_single_source_max(s)
