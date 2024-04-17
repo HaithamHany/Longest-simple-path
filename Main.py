@@ -49,6 +49,7 @@ def create_random_graphs():
 
 def lsp_test(file: str = None):
 
+    print(file)
     # Initialize the graph and read edges from file
     g = Graph()
     try:
@@ -84,12 +85,15 @@ def lsp_test(file: str = None):
     print("DFS Longest Simple Path:", dfs_lsp_path)
 
     # A*
-    astar = aStar(g, lcc)
-    start_astar = time()
-    astar_length, astar_lsp_path = astar.find_longest_simple_path()
-    end_astar = time()
-    print("A* Longest Simple Path Length:", len(astar_lsp_path))
-    print("A* Longest Simple Path:", astar_lsp_path)
+    invalid_files = {"Graphs/DSJC500-5.mtx", "Graphs/inf-euroroad.edges", "Graphs/inf-power.mtx"} # Don't run astar for online graphs
+    if file not in invalid_files:
+
+        astar = aStar(g, lcc)
+        start_astar = time()
+        astar_length, astar_lsp_path = astar.find_longest_simple_path()
+        end_astar = time()
+        print("A* Longest Simple Path Length:", len(astar_lsp_path))
+        print("A* Longest Simple Path:", astar_lsp_path)
 
     # GRASP
     grasp = Grasp(g, lcc)
@@ -105,7 +109,8 @@ def lsp_test(file: str = None):
     print(f"LCC (DFS_LCC)\t{end_lcc - start_lcc:.6f}\t{len(lcc)} -> vertices count")
     print(f"Dijkstra's\t\t{end_dijkstra - start_dijkstra:.6f}\t{dijkstra_length} -> edges count")
     print(f"DFS\t\t\t\t{end_dfs - start_dfs:.6f}\t{dfs_lsp_length} -> edges count")
-    print(f"A*\t\t\t\t{end_astar - start_astar:.6f}\t{len(astar_lsp_path)} -> vertices count")
+    if file not in invalid_files:
+        print(f"A*\t\t\t\t{end_astar - start_astar:.6f}\t{len(astar_lsp_path)} -> vertices count")
     print(f"GRASP\t\t\t{end_grasp - start_grasp:.6f}\t{len(grasp_lsp_path)} -> vertices count")
     print("===============================================")
 
@@ -128,10 +133,11 @@ def lsp_test(file: str = None):
     # print(dfs_metrics_results)
     print("===============================================")
     # Metrics for A*
-    astar_metrics = GraphMetrics(g, lcc, astar_lsp_path)
-    astar_metrics_results = astar_metrics.print_all_metrics("A* Metrics")
-    print(astar_metrics_results)
-    print("===============================================")
+    if file not in invalid_files:
+        astar_metrics = GraphMetrics(g, lcc, astar_lsp_path)
+        astar_metrics_results = astar_metrics.print_all_metrics("A* Metrics")
+        print(astar_metrics_results)
+        print("===============================================")
     # Metrics for GRASP
     grasp_metrics = GraphMetrics(g, lcc, grasp_lsp_path)
     grasp_metrics_results = grasp_metrics.print_all_metrics("GRASP Metrics")

@@ -35,3 +35,6 @@ Available files:
 Select a file by number:
 
 Input the number corresponding to the file you wish to analyze and press Enter.
+
+*Please note that the amount of iterations and candidates node sizes for the GRASP
+heuristic can be modified directly in the class attributes.
