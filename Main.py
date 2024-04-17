@@ -1,16 +1,21 @@
+import os
 from time import time
 import sys
 from DFS import DFS
 from DijkstraMax import DijkstraMax
 from Grasp import Grasp
+from Spinner import Spinner
 from aStar import aStar
 from GraphMetrics import GraphMetrics
 from Graph import Graph
 from math import sqrt
+import threading
+
 sys.setrecursionlimit(1500)
 
-
+spinner = Spinner()
 def binary_search(n, interval, filename: str):
+
     g = Graph()
     left, right = 0, sqrt(2)
     success = False
@@ -43,9 +48,15 @@ def create_random_graphs():
 
 
 def lsp_test(file: str = None):
+
     # Initialize the graph and read edges from file
     g = Graph()
-    g.generate_random_geometric_graph(100, 0.1)
+    try:
+        g.read_edges_with_coordinates_from_file(file) if file is not None else g.generate_random_geometric_graph_full(
+            100,
+            0.1)
+    except IndexError:
+        g.read_edges_from_file(file)
 
     # LCC (DFS_LCC)
     dfs = DFS(g)
@@ -54,8 +65,11 @@ def lsp_test(file: str = None):
     end_lcc = time()
     print("Largest Connected Component:", lcc)
 
+
+    spinner.start()
+
     # DijkstraMax
-    dijkstra = DijkstraMax(g)
+    dijkstra = DijkstraMax(g, lcc)
     start_dijkstra = time()
     dijkstra_length, dijkstra_path = dijkstra.get_longest_path()
     end_dijkstra = time()
@@ -111,7 +125,7 @@ def lsp_test(file: str = None):
     # Metrics for DFS
     dfs_metrics = GraphMetrics(g, lcc, dfs_lsp_path)
     dfs_metrics_results = dfs_metrics.print_all_metrics("DFS Metrics")
-    print(dfs_metrics_results)
+    # print(dfs_metrics_results)
     print("===============================================")
     # Metrics for A*
     astar_metrics = GraphMetrics(g, lcc, astar_lsp_path)
@@ -122,8 +136,43 @@ def lsp_test(file: str = None):
     grasp_metrics = GraphMetrics(g, lcc, grasp_lsp_path)
     grasp_metrics_results = grasp_metrics.print_all_metrics("GRASP Metrics")
     print(grasp_metrics_results)
+    spinner.stop()
+
+
+def list_files(directory):
+    """List all files in a directory."""
+    return [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
+
+
+def select_file():
+    directory = "Graphs"  # Set your directory
+    files = list_files(directory)
+
+    if not files:
+        print("No files found.")
+        return None
+
+    print("Available files:")
+    for index, file in enumerate(files):
+        print(f"{index + 1}: {file}")
+
+    while True:
+        try:
+            selection = int(input("Select a file by number: ")) - 1
+            if 0 <= selection < len(files):
+                return files[selection]
+            else:
+                print("Invalid selection. Please try again.")
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
 
 if __name__ == "__main__":
-    #create_random_graphs()  # Creating the graphs for the project requirements
-    fileName = "Graphs/inf-power.mtx"  # Path to the graph file
-    lsp_test(fileName)
+    while True:
+        spinner.stop()
+        print("===============================================")
+        file_name = select_file()
+        if file_name is None:
+            break
+        file_path = f"Graphs/{file_name}"
+        lsp_test(file_path)
