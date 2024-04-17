@@ -4,4 +4,4 @@ class PriorityQueueNode:
         self.distance = distance
 
     def __lt__(self, other):
-        return self.distance > other.distance
+        return self.distance < other.distance

@@ -4,8 +4,9 @@ from PriorityQueueNode import PriorityQueueNode
 
 
 class DijkstraMax:
-    def __init__(self, graph):
+    def __init__(self, graph, lcc_vertices):
         self.graph = graph
+        self.lcc = {v: self.graph.vertices[v] for v in lcc_vertices if v in self.graph.vertices}  # Filtered LCC from the graph
         self.Q = []  # Priority queue
 
     def initialize_single_source_max(self, s):
@@ -49,9 +50,9 @@ class DijkstraMax:
         longest_path_length = 0
         longest_path = []
 
-        for v in self.graph.vertices:
-            dijkstra_max = DijkstraMax(self.graph)
-            path, length = dijkstra_max.dijkstra_max(v)
+        for v in self.lcc:
+            self.initialize_single_source_max(v)
+            path, length = self.dijkstra_max(v)
             if length > longest_path_length:
                 longest_path_length = length
                 longest_path = path
